@@ -1,0 +1,12 @@
+environment_config:
+  path: environment_config.dart # optional, result file path against `lib/` folder
+  dotenv_path: .env # optional, result file path for .env file against project root folder
+  class: EnvironmentConfig # optional, class name
+
+  fields:
+    serverUrl: # Backend server URL.
+      type: String
+      default: localhost:8080
+    useHttps: # Should we use HTTPS to ask the backend server.
+      type: bool
+      default: false
