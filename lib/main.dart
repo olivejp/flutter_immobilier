@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_immobilier/service/annonce_immobiliere_service.dart';
+import 'package:flutter_immobilier/service/service_toast.dart';
 import 'package:get_it/get_it.dart';
 
-import 'environment_config.dart';
+void injectDependencies() {
+  GetIt.I.registerSingletonAsync(() => Future.value(ServiceToast()));
+  GetIt.I
+      .registerSingletonAsync(() => Future.value(AnnonceImmobiliereService()));
+}
 
 void main() {
+  injectDependencies();
   runApp(const MyApp());
 }
 
@@ -13,8 +19,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    GetIt.I.registerFactory(() =>
-        AnnonceImmobiliereService('annonces', EnvironmentConfig.serverUrl));
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(

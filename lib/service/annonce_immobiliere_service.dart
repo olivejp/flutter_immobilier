@@ -1,29 +1,38 @@
-import 'dart:convert';
+import 'dart:io';
 
-import 'package:flutter_immobilier/service/rest/abstract-rest-domain.service.dart';
-import 'package:http/http.dart';
+import 'package:flutter_immobilier/deveoLibrary/abstract_http_service.dart';
+import 'package:flutter_immobilier/deveoLibrary/interface_interceptor.dart';
+import 'package:http/http.dart' as http;
 
 import '../domain/annonce_immobiliere.dart';
 
-class AnnonceImmobiliereService extends RestDomainService<Annonce> {
+class AnnonceImmobiliereService extends AbstractHttpService<Annonce, String> {
   /*Constructor*/
-  AnnonceImmobiliereService(String path, String authority)
-      : super(path, authority: authority);
+  AnnonceImmobiliereService({
+    InterfaceInterceptor? interceptor,
+    Map<String, String>? Function()? getHeaders,
+  }) : super(
+            path: '/annonces',
+            interceptor: interceptor,
+            getHeaders: getHeaders,
+            defaultHeaders: {
+              HttpHeaders.contentTypeHeader: 'application/json',
+            });
 
   @override
-  Annonce mapResponseToDomain(Response response) {
-    return Annonce.fromJson(json.decode(response.body));
-  }
-
-  @override
-  List<Annonce> mapResponseToListDomain(Response response) {
-    List<dynamic> listJson = json.decode(response.body);
-    return listJson.map((e) => Annonce.fromJson(e)).toList();
+  Annonce fromJson(Map<String, dynamic> map) {
+    return Annonce.fromJson(map);
   }
 
   Future<List<Annonce>> search(String search) {
-    return restHttpService
-        .get('$path/search/$search')
-        .then((response) => mapResponseToListDomain(response));
+    final Uri uri = buildUri('$path/search/$search', null);
+    return callInterceptor(http.get(uri)).then((response) {
+      if (isStatusBetween200And299(response)) {
+        final List<dynamic> listMap = decodeResponseBodyWithJsonPath(response!);
+        return listMap.map((e) => fromJson(e)).toList();
+      } else {
+        return [];
+      }
+    });
   }
 }
