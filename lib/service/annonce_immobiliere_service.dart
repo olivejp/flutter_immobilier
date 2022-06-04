@@ -6,6 +6,7 @@ import 'package:http/http.dart';
 import '../domain/annonce_immobiliere.dart';
 
 class AnnonceImmobiliereService extends RestDomainService<Annonce> {
+  /*Constructor*/
   AnnonceImmobiliereService(String path, String authority)
       : super(path, authority: authority);
 
@@ -22,7 +23,7 @@ class AnnonceImmobiliereService extends RestDomainService<Annonce> {
 
   Future<List<Annonce>> search(String search) {
     return restHttpService
-        .get('${restHttpService.path}/search/$search')
+        .get('$path/search/$search')
         .then((response) => mapResponseToListDomain(response));
   }
 }

@@ -1,6 +1,6 @@
 import 'package:http/http.dart' as http;
 
-class HttpService {
+abstract class HttpService {
   final String authority;
   final bool isHttps;
 
