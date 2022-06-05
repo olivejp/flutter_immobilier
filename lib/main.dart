@@ -4,6 +4,8 @@ import 'package:flutter_immobilier/search_notifier.dart';
 import 'package:flutter_immobilier/service/annonce_immobiliere_service.dart';
 import 'package:flutter_immobilier/service/service_toast.dart';
 import 'package:get_it/get_it.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import 'domain/annonce_immobiliere.dart';
@@ -28,8 +30,18 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Application Immobilière',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
+          primarySwatch: Colors.blue,
+          textTheme: TextTheme(
+            bodyText1: GoogleFonts.nunito().copyWith(fontSize: 18),
+            bodyText2: GoogleFonts.nunito().copyWith(fontSize: 16),
+            headline6: GoogleFonts.nunito()
+                .copyWith(color: Colors.orange, fontSize: 18),
+            subtitle1: GoogleFonts.nunito()
+                .copyWith(color: Colors.grey.shade600, fontSize: 17),
+            subtitle2: GoogleFonts.nunito().copyWith(fontSize: 14),
+            caption: GoogleFonts.nunito()
+                .copyWith(color: Colors.grey.shade300, fontSize: 14),
+          )),
       home: const MyHomePage(),
     );
   }
@@ -117,24 +129,23 @@ class MyHomePage extends StatelessWidget {
                           ],
                         ),
                         Consumer<SearchNotifier>(
-                          builder: (context, notifier, child) {
-                            return ToggleButtons(
-                              selectedColor: Colors.amber,
-                              fillColor: Colors.grey.shade50,
-                              onPressed: (index) =>notifier.selectFilter(index),
-                              renderBorder: false,
-                              isSelected: notifier.transactionFiltersEnable,
-                              children: notifier.transactionFilters
-                                  .map(
-                                    (e) => Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Text(e.value!),
-                                    ),
-                                  )
-                                  .toList(),
-                            );
-                          }
-                        )
+                            builder: (context, notifier, child) {
+                          return ToggleButtons(
+                            selectedColor: Colors.amber,
+                            fillColor: Colors.grey.shade50,
+                            onPressed: (index) => notifier.selectFilter(index),
+                            renderBorder: false,
+                            isSelected: notifier.transactionFiltersEnable,
+                            children: notifier.transactionFilters
+                                .map(
+                                  (e) => Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text(e.value!),
+                                  ),
+                                )
+                                .toList(),
+                          );
+                        })
                       ],
                     ),
                   ),
@@ -182,6 +193,10 @@ class MyHomePage extends StatelessWidget {
                           }),
                         ),
                       ),
+                      Flexible(
+                        flex: 1,
+                        child: Container(),
+                      )
                     ],
                   ),
                 ],
@@ -399,6 +414,7 @@ class CardAnnonce extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var formatter = NumberFormat('#,###', "fr_FR");
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -406,17 +422,104 @@ class CardAnnonce extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-                '${annonce.transaction ?? ''} ${annonce.categorie ?? ''} ${annonce.type ?? ''} ${annonce.quartier ?? ''} ${annonce.superficie != null ? '${annonce.superficie} M2' : ''}'),
-            const Divider(),
-            Text('Description : ${annonce.description ?? ''}'),
-            const Divider(),
-            Text('Quartier : ${annonce.quartier ?? ''}'),
-            const Divider(),
-            Text('Prix : ${annonce.prix}'),
-            const Divider(),
-            Text('Agence : ${annonce.nomAgence}'),
+              '${annonce.transaction ?? ''} ${annonce.categorie ?? ''} ${annonce.type ?? ''} ${annonce.quartier ?? ''} - ${annonce.superficie != null ? '${annonce.superficie} m²' : ''}',
+              style: Theme.of(context).textTheme.headline6,
+            ),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Flexible(
+                  child: Image.network(
+                      'https://www.bienmeloger.nc/media/043/thumbs/280718b0-884b-4b72-adc9-fcd2af4778db-202204301043.jpeg'),
+                ),
+                Flexible(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    child: Text(
+                      'Description : ${annonce.description ?? ''}',
+                      style: Theme.of(context).textTheme.subtitle1,
+                    ),
+                  ),
+                ),
+                Flexible(
+                  flex: 1,
+                  child: Column(
+                    children: [
+                      CardAnnonceDetailLine(
+                        title: 'Quartier',
+                        detail: annonce.quartier ?? '',
+                      ),
+                      Divider(
+                        height: 1,
+                        color: Colors.grey.shade100,
+                      ),
+                      CardAnnonceDetailLine(
+                        title: 'Superficie',
+                        detail: (annonce.superficie != null)
+                            ? '${annonce.superficie}'
+                            : 'Inconnu',
+                      ),
+                      Divider(
+                        height: 1,
+                        color: Colors.grey.shade100,
+                      ),
+                      CardAnnonceDetailLine(
+                        title: 'Agence',
+                        detail: '${annonce.nomAgence}',
+                      ),
+                      Divider(
+                        height: 1,
+                        color: Colors.grey.shade100,
+                      ),
+                      CardAnnonceDetailLine(
+                        title: 'Prix',
+                        detail: (annonce.prix != null && annonce.prix! > 0)
+                            ? formatter.format(annonce.prix)
+                            : 'Inconnu',
+                      ),
+                    ],
+                  ),
+                )
+              ],
+            ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class CardAnnonceDetailLine extends StatelessWidget {
+  const CardAnnonceDetailLine({
+    Key? key,
+    required this.title,
+    required this.detail,
+  }) : super(key: key);
+
+  final String title;
+  final String detail;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 15, bottom: 15),
+      child: Row(
+        children: [
+          Expanded(
+            flex: 1,
+            child: Text(
+              title,
+              style: Theme.of(context).textTheme.caption,
+            ),
+          ),
+          Expanded(
+            flex: 3,
+            child: Text(
+              detail,
+              style: Theme.of(context).textTheme.subtitle2,
+            ),
+          )
+        ],
       ),
     );
   }
