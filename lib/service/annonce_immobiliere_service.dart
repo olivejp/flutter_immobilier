@@ -54,8 +54,9 @@ class AnnonceImmobiliereService extends AbstractHttpService<Annonce, String> {
       String search, SearchFacetBody? searchFacetBody) {
     final Uri uri = buildUri('$path/facets/$search', null);
 
+    /// TODO Supprimer tous ces buckets qui n'étaient là que pour les exemples.
     final BucketAggregationModel facetRequest = BucketAggregationModel();
-    facetRequest.name = "Type";
+    facetRequest.name = "Transaction";
     facetRequest.field = "type.label.keyword";
     facetRequest.typeAggregation = TypeAggregation.TERMS;
 
@@ -69,6 +70,7 @@ class AnnonceImmobiliereService extends AbstractHttpService<Annonce, String> {
     maxPriceFacet.field = "price.amount";
     maxPriceFacet.typeAggregation = TypeAggregation.MAX;
 
+    searchFacetBody?.listBucketModel.clear();
     searchFacetBody?.listBucketModel.add(facetRequest);
     searchFacetBody?.listBucketModel.add(quartierFacet);
     searchFacetBody?.listBucketModel.add(maxPriceFacet);

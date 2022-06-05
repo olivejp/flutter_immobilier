@@ -63,15 +63,30 @@ class MyHomePage extends StatelessWidget {
               child: Consumer<SearchNotifier>(builder: (context, value, child) {
                 return Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: List.generate(
-                    value.pageAnnonce?.totalPages ?? 0,
-                    (index) => TextButton(
-                      child: Text('$index'),
-                      onPressed: () => context
-                          .read<SearchNotifier>()
-                          .search(scrollController: scrollController),
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(right: 20),
+                      child: Text(
+                          'Résultats : ${value.pageAnnonce?.totalElements ?? 0}'),
                     ),
-                  ),
+                    Padding(
+                      padding: const EdgeInsets.only(right: 20),
+                      child: Text(
+                          'Nombre de page : ${value.pageAnnonce?.totalPages ?? 0}'),
+                    ),
+                    ...List.generate(
+                      value.pageAnnonce?.totalPages ?? 0,
+                      (index) => TextButton(
+                        child: Text('$index'),
+                        onPressed: () {
+                          context.read<SearchNotifier>().setActualPage(index);
+                          context
+                              .read<SearchNotifier>()
+                              .search(scrollController: scrollController);
+                        },
+                      ),
+                    )
+                  ],
                 );
               }),
             ),
@@ -89,13 +104,37 @@ class MyHomePage extends StatelessWidget {
                       ),
                     ),
                     child: Row(
-                      children: const [
-                        TopBannerFilter(title: 'Transaction'),
-                        TopBannerFilter(title: 'Bien'),
-                        TopBannerFilter(title: 'Type'),
-                        TopBannerFilter(title: 'Surface'),
-                        TopBannerFilter(title: 'Localité'),
-                        TopBannerFilter(title: 'Budget'),
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: const [
+                            TopBannerFilter(title: 'Transaction'),
+                            TopBannerFilter(title: 'Bien'),
+                            TopBannerFilter(title: 'Type'),
+                            TopBannerFilter(title: 'Surface'),
+                            TopBannerFilter(title: 'Localité'),
+                            TopBannerFilter(title: 'Budget'),
+                          ],
+                        ),
+                        Consumer<SearchNotifier>(
+                          builder: (context, notifier, child) {
+                            return ToggleButtons(
+                              selectedColor: Colors.amber,
+                              fillColor: Colors.grey.shade50,
+                              onPressed: (index) =>notifier.selectFilter(index),
+                              renderBorder: false,
+                              isSelected: notifier.transactionFiltersEnable,
+                              children: notifier.transactionFilters
+                                  .map(
+                                    (e) => Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text(e.value!),
+                                    ),
+                                  )
+                                  .toList(),
+                            );
+                          }
+                        )
                       ],
                     ),
                   ),
@@ -165,9 +204,9 @@ class TopBannerFilter extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.only(
         left: 30,
-        bottom: 10,
+        bottom: 4,
         right: 10,
-        top: 10,
+        top: 4,
       ),
       decoration: BoxDecoration(
         border: Border(

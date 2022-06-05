@@ -13,7 +13,7 @@ Facet _$FacetFromJson(Map<String, dynamic> json) {
     ..buckets = (json['buckets'] as List<dynamic>?)
         ?.map((e) => Bucket.fromJson(e as Map<String, dynamic>))
         .toList()
-    ..value = (json['value'] as num?)?.toDouble()
+    ..value = json['value']
     ..typeAggregation =
         _$enumDecodeNullable(_$TypeAggregationEnumMap, json['typeAggregation']);
 }

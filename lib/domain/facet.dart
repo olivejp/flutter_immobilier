@@ -10,7 +10,7 @@ class Facet {
   String? name;
   String? field;
   List<Bucket>? buckets;
-  double? value;
+  dynamic value;
   TypeAggregation? typeAggregation;
 
   Facet();
