@@ -3,11 +3,12 @@ import 'dart:io';
 
 import 'package:flutter_immobilier/deveoLibrary/abstract_http_service.dart';
 import 'package:flutter_immobilier/deveoLibrary/interface_interceptor.dart';
-import 'package:flutter_immobilier/domain/facet.dart';
 import 'package:flutter_immobilier/domain/facet_request.dart';
+import 'package:flutter_immobilier/domain/search_request_body.dart';
 import 'package:http/http.dart' as http;
 
 import '../domain/annonce_immobiliere.dart';
+import '../domain/facet.dart';
 
 class AnnonceImmobiliereService extends AbstractHttpService<Annonce, String> {
   /*Constructor*/
@@ -27,9 +28,14 @@ class AnnonceImmobiliereService extends AbstractHttpService<Annonce, String> {
     return Annonce.fromJson(map);
   }
 
-  Future<List<Annonce>> search(String search) {
+  Future<List<Annonce>> search(String search, SearchBodyRequest? bodyRequest) {
     final Uri uri = buildUri('$path/search/$search', null);
-    return callInterceptor(http.get(uri)).then((response) {
+    final String body = jsonEncode(bodyRequest?.toJson());
+    return callInterceptor(http.post(
+      uri,
+      body: body,
+      headers: mergeHeaders(),
+    )).then((response) {
       if (isStatusBetween200And299(response)) {
         final List<dynamic> listMap = decodeResponseBodyWithJsonPath(response!);
         return listMap.map((e) => fromJson(e)).toList();

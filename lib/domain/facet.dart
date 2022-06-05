@@ -1,6 +1,7 @@
 import 'package:json_annotation/json_annotation.dart';
 
-import 'bucket.dart';
+import '../domain/bucket.dart';
+import 'facet_request.dart';
 
 part 'facet.g.dart';
 
@@ -9,6 +10,8 @@ class Facet {
   String? name;
   String? field;
   List<Bucket>? buckets;
+  double? value;
+  TypeAggregation? typeAggregation;
 
   Facet();
 

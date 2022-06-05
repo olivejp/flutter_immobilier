@@ -37,6 +37,7 @@ class MyApp extends StatelessWidget {
 
 class MyHomePage extends StatelessWidget {
   const MyHomePage({Key? key}) : super(key: key);
+  static const List<String> _selectedAnimals = ['Lion', 'Tiger', 'Penguin'];
 
   @override
   Widget build(BuildContext context) {
@@ -45,57 +46,147 @@ class MyHomePage extends StatelessWidget {
         builder: (context, child) {
           return Scaffold(
             appBar: AppBar(
+              toolbarHeight: 60,
+              elevation: 0,
               title: const AppBarImmobilier(),
             ),
-            body: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Flexible(
-                  flex: 1,
-                  child: Column(
+            body: SingleChildScrollView(
+              child: Column(
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      border: Border.symmetric(
+                        horizontal: BorderSide(
+                            width: 1,
+                            style: BorderStyle.solid,
+                            color: Colors.grey.shade300),
+                      ),
+                    ),
+                    child: Row(
+                      children: const [
+                        TopBannerFilter(title: 'Transaction'),
+                        TopBannerFilter(title: 'Bien'),
+                        TopBannerFilter(title: 'Type'),
+                        TopBannerFilter(title: 'Surface'),
+                        TopBannerFilter(title: 'Localité'),
+                        TopBannerFilter(title: 'Budget'),
+                      ],
+                    ),
+                  ),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Consumer<SearchNotifier>(
-                          builder: (context, value, child) {
-                        if (value.listFacet.isEmpty) {
-                          return const Text('Aucun filtre');
-                        } else {
-                          return ListView.builder(
-                            itemCount: value.listFacet.length,
-                            shrinkWrap: true,
-                            itemBuilder: (context, index) {
-                              final Facet facet = value.listFacet[index];
-                              return CardFacet(facet: facet);
-                            },
-                          );
-                        }
-                      }),
+                      Flexible(
+                        flex: 1,
+                        child: Consumer<SearchNotifier>(
+                            builder: (context, value, child) {
+                          if (value.listFacet.isEmpty) {
+                            return const Text('Aucun filtre');
+                          } else {
+                            return ListView.builder(
+                              itemCount: value.listFacet.length,
+                              shrinkWrap: true,
+                              itemBuilder: (context, index) {
+                                final Facet facet = value.listFacet[index];
+                                return CardFacet(facet: facet);
+                              },
+                            );
+                          }
+                        }),
+                      ),
+                      Flexible(
+                        flex: 3,
+                        child: Center(
+                          child: Consumer<SearchNotifier>(
+                              builder: (context, value, child) {
+                            if (value.listAnnonce.isEmpty) {
+                              return const Text('Aucune annonce');
+                            } else {
+                              return ListView.builder(
+                                itemCount: value.listAnnonce.length,
+                                shrinkWrap: true,
+                                itemBuilder: (context, index) {
+                                  Annonce annonce = value.listAnnonce[index];
+                                  return CardAnnonce(annonce: annonce);
+                                },
+                              );
+                            }
+                          }),
+                        ),
+                      ),
                     ],
                   ),
-                ),
-                Flexible(
-                  flex: 3,
-                  child: Center(
-                    child: Consumer<SearchNotifier>(
-                        builder: (context, value, child) {
-                      if (value.listAnnonce.isEmpty) {
-                        return const Text('Aucune annonce');
-                      } else {
-                        return ListView.builder(
-                          itemCount: value.listAnnonce.length,
-                          shrinkWrap: true,
-                          itemBuilder: (context, index) {
-                            Annonce annonce = value.listAnnonce[index];
-                            return CardAnnonce(annonce: annonce);
-                          },
-                        );
-                      }
-                    }),
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
           );
         });
+  }
+}
+
+class TopBannerFilter extends StatelessWidget {
+  const TopBannerFilter({
+    Key? key,
+    required this.title,
+  }) : super(key: key);
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.only(
+        left: 30,
+        bottom: 10,
+        right: 10,
+        top: 10,
+      ),
+      decoration: BoxDecoration(
+        border: Border(
+          right: BorderSide(
+            color: Colors.grey.shade300,
+            width: 1,
+          ),
+        ),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(title),
+          PopupMenuButton(
+            offset: Offset(0, 20),
+            iconSize: 20,
+            position: PopupMenuPosition.under,
+            icon: const Icon(
+              Icons.arrow_drop_down_sharp,
+            ),
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                enabled: false,
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(
+                    minWidth: 150,
+                    minHeight: 200,
+                  ),
+                  child: Wrap(
+                    children: [
+                      TextButton(
+                        onPressed: () {},
+                        child: const Text('First option'),
+                      ),
+                      TextButton(
+                        onPressed: () {},
+                        child: const Text('Second option'),
+                      ),
+                    ],
+                  ),
+                ),
+              )
+            ],
+          ),
+        ],
+      ),
+    );
   }
 }
 
@@ -107,10 +198,9 @@ class AppBarImmobilier extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final TextEditingController searchTextController = TextEditingController();
-    return AppBar(
-      toolbarHeight: 70,
-      elevation: 0,
-      title: Row(
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 1600),
+      child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           const Icon(
@@ -170,6 +260,7 @@ class AppBarImmobilier extends StatelessWidget {
                         Radius.circular(25),
                       ),
                     )),
+                onChanged: (value) => context.read<SearchNotifier>().setQuery(value),
                 onFieldSubmitted: (value) {
                   context.read<SearchNotifier>().setQuery(value);
                   context.read<SearchNotifier>().search();
@@ -246,14 +337,15 @@ class CardAnnonce extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('${annonce.transaction} ${annonce.categorie} ${annonce.type} ${annonce.quartier} ${annonce.superficie ?? ''}'),
-            Divider(),
+            Text(
+                '${annonce.transaction} ${annonce.categorie} ${annonce.type} ${annonce.quartier} ${annonce.superficie ?? ''}'),
+            const Divider(),
             Text('Description : ${annonce.description ?? ''}'),
-            Divider(),
+            const Divider(),
             Text('Quartier : ${annonce.quartier ?? ''}'),
-            Divider(),
+            const Divider(),
             Text('Prix : ${annonce.prix}'),
-            Divider(),
+            const Divider(),
             Text('Agence : ${annonce.nomAgence}'),
           ],
         ),
