@@ -4,13 +4,13 @@ import 'package:json_annotation/json_annotation.dart';
 part 'search_request_body.g.dart';
 
 @JsonSerializable()
-class SearchBodyRequest {
-  List<SearchFilter>? filters;
+class SearchRequestBody {
+  List<SearchFilter> filters = [];
 
-  SearchBodyRequest();
+  SearchRequestBody();
 
-  factory SearchBodyRequest.fromJson(Map<String, dynamic> data) =>
-      _$SearchBodyRequestFromJson(data);
+  factory SearchRequestBody.fromJson(Map<String, dynamic> data) =>
+      _$SearchRequestBodyFromJson(data);
 
-  Map<String, dynamic> toJson() => _$SearchBodyRequestToJson(this);
+  Map<String, dynamic> toJson() => _$SearchRequestBodyToJson(this);
 }

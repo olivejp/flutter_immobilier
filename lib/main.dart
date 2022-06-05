@@ -37,10 +37,10 @@ class MyApp extends StatelessWidget {
 
 class MyHomePage extends StatelessWidget {
   const MyHomePage({Key? key}) : super(key: key);
-  static const List<String> _selectedAnimals = ['Lion', 'Tiger', 'Penguin'];
 
   @override
   Widget build(BuildContext context) {
+    final ScrollController scrollController = ScrollController();
     return ChangeNotifierProvider(
         create: (BuildContext context) => SearchNotifier(),
         builder: (context, child) {
@@ -50,7 +50,33 @@ class MyHomePage extends StatelessWidget {
               elevation: 0,
               title: const AppBarImmobilier(),
             ),
+            bottomNavigationBar: Container(
+              height: 50,
+              decoration: BoxDecoration(
+                border: Border(
+                  top: BorderSide(
+                    color: Colors.grey.shade300,
+                    width: 1,
+                  ),
+                ),
+              ),
+              child: Consumer<SearchNotifier>(builder: (context, value, child) {
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(
+                    value.pageAnnonce?.totalPages ?? 0,
+                    (index) => TextButton(
+                      child: Text('$index'),
+                      onPressed: () => context
+                          .read<SearchNotifier>()
+                          .search(scrollController: scrollController),
+                    ),
+                  ),
+                );
+              }),
+            ),
             body: SingleChildScrollView(
+              controller: scrollController,
               child: Column(
                 children: [
                   Container(
@@ -100,15 +126,17 @@ class MyHomePage extends StatelessWidget {
                         child: Center(
                           child: Consumer<SearchNotifier>(
                               builder: (context, value, child) {
-                            if (value.listAnnonce.isEmpty) {
+                            List<Annonce> listAnnonce =
+                                value.pageAnnonce?.content ?? [];
+                            if (listAnnonce.isEmpty) {
                               return const Text('Aucune annonce');
                             } else {
                               return ListView.builder(
-                                itemCount: value.listAnnonce.length,
+                                itemCount: listAnnonce.length,
                                 shrinkWrap: true,
                                 itemBuilder: (context, index) {
-                                  Annonce annonce = value.listAnnonce[index];
-                                  return CardAnnonce(annonce: annonce);
+                                  return CardAnnonce(
+                                      annonce: listAnnonce[index]);
                                 },
                               );
                             }
@@ -154,7 +182,7 @@ class TopBannerFilter extends StatelessWidget {
         children: [
           Text(title),
           PopupMenuButton(
-            offset: Offset(0, 20),
+            offset: const Offset(0, 20),
             iconSize: 20,
             position: PopupMenuPosition.under,
             icon: const Icon(
@@ -260,7 +288,8 @@ class AppBarImmobilier extends StatelessWidget {
                         Radius.circular(25),
                       ),
                     )),
-                onChanged: (value) => context.read<SearchNotifier>().setQuery(value),
+                onChanged: (value) =>
+                    context.read<SearchNotifier>().setQuery(value),
                 onFieldSubmitted: (value) {
                   context.read<SearchNotifier>().setQuery(value);
                   context.read<SearchNotifier>().search();
@@ -338,7 +367,7 @@ class CardAnnonce extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-                '${annonce.transaction} ${annonce.categorie} ${annonce.type} ${annonce.quartier} ${annonce.superficie ?? ''}'),
+                '${annonce.transaction ?? ''} ${annonce.categorie ?? ''} ${annonce.type ?? ''} ${annonce.quartier ?? ''} ${annonce.superficie != null ? '${annonce.superficie} M2' : ''}'),
             const Divider(),
             Text('Description : ${annonce.description ?? ''}'),
             const Divider(),

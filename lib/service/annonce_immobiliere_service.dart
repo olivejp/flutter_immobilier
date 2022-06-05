@@ -3,12 +3,14 @@ import 'dart:io';
 
 import 'package:flutter_immobilier/deveoLibrary/abstract_http_service.dart';
 import 'package:flutter_immobilier/deveoLibrary/interface_interceptor.dart';
-import 'package:flutter_immobilier/domain/facet_request.dart';
+import 'package:flutter_immobilier/domain/bucket_aggregation_model.dart';
+import 'package:flutter_immobilier/domain/search_facet_body.dart';
 import 'package:flutter_immobilier/domain/search_request_body.dart';
 import 'package:http/http.dart' as http;
 
 import '../domain/annonce_immobiliere.dart';
 import '../domain/facet.dart';
+import '../domain/page.dart';
 
 class AnnonceImmobiliereService extends AbstractHttpService<Annonce, String> {
   /*Constructor*/
@@ -28,8 +30,12 @@ class AnnonceImmobiliereService extends AbstractHttpService<Annonce, String> {
     return Annonce.fromJson(map);
   }
 
-  Future<List<Annonce>> search(String search, SearchBodyRequest? bodyRequest) {
-    final Uri uri = buildUri('$path/search/$search', null);
+  Future<Page<Annonce>> search(
+    String search,
+    SearchRequestBody? bodyRequest, {
+    Map<String, String>? requestParams,
+  }) {
+    final Uri uri = buildUri('$path/search/$search', requestParams);
     final String body = jsonEncode(bodyRequest?.toJson());
     return callInterceptor(http.post(
       uri,
@@ -37,38 +43,39 @@ class AnnonceImmobiliereService extends AbstractHttpService<Annonce, String> {
       headers: mergeHeaders(),
     )).then((response) {
       if (isStatusBetween200And299(response)) {
-        final List<dynamic> listMap = decodeResponseBodyWithJsonPath(response!);
-        return listMap.map((e) => fromJson(e)).toList();
+        return Page.fromJson(decodeResponseBodyWithJsonPath(response!));
       } else {
-        return [];
+        return Page();
       }
     });
   }
 
-  Future<List<Facet>> searchFacet(String search) {
+  Future<List<Facet>> searchFacet(
+      String search, SearchFacetBody? searchFacetBody) {
     final Uri uri = buildUri('$path/facets/$search', null);
-    final List<Map<String, dynamic>> listFacetRequest = [];
-    final FacetRequest facetRequest = FacetRequest();
+
+    final BucketAggregationModel facetRequest = BucketAggregationModel();
     facetRequest.name = "Type";
     facetRequest.field = "type.label.keyword";
     facetRequest.typeAggregation = TypeAggregation.TERMS;
 
-    final FacetRequest quartierFacet = FacetRequest();
+    final BucketAggregationModel quartierFacet = BucketAggregationModel();
     quartierFacet.name = "Quartier";
     quartierFacet.field = "realty.localization.label.keyword";
     quartierFacet.typeAggregation = TypeAggregation.TERMS;
 
-    final FacetRequest maxPriceFacet = FacetRequest();
+    final BucketAggregationModel maxPriceFacet = BucketAggregationModel();
     maxPriceFacet.name = "Prix maximum";
     maxPriceFacet.field = "price.amount";
     maxPriceFacet.typeAggregation = TypeAggregation.MAX;
 
-    listFacetRequest.add(facetRequest.toJson());
-    listFacetRequest.add(quartierFacet.toJson());
-    listFacetRequest.add(maxPriceFacet.toJson());
+    searchFacetBody?.listBucketModel.add(facetRequest);
+    searchFacetBody?.listBucketModel.add(quartierFacet);
+    searchFacetBody?.listBucketModel.add(maxPriceFacet);
+
     return callInterceptor(http.post(
       uri,
-      body: jsonEncode(listFacetRequest),
+      body: jsonEncode(searchFacetBody?.toJson()),
       headers: mergeHeaders(),
     )).then((response) {
       if (isStatusBetween200And299(response)) {

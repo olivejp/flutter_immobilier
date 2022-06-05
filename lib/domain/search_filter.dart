@@ -2,10 +2,14 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'search_filter.g.dart';
 
+enum TypeSearchFilter {
+  MATCH
+}
+
 @JsonSerializable()
 class SearchFilter {
   String? field;
-  String? type;
+  TypeSearchFilter? type;
   String? value;
 
   SearchFilter({this.field, this.type, this.value});

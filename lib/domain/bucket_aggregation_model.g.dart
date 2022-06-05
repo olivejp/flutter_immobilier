@@ -1,20 +1,22 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'facet_request.dart';
+part of 'bucket_aggregation_model.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-FacetRequest _$FacetRequestFromJson(Map<String, dynamic> json) {
-  return FacetRequest()
+BucketAggregationModel _$BucketAggregationModelFromJson(
+    Map<String, dynamic> json) {
+  return BucketAggregationModel()
     ..name = json['name'] as String?
     ..field = json['field'] as String?
     ..typeAggregation =
         _$enumDecodeNullable(_$TypeAggregationEnumMap, json['typeAggregation']);
 }
 
-Map<String, dynamic> _$FacetRequestToJson(FacetRequest instance) =>
+Map<String, dynamic> _$BucketAggregationModelToJson(
+        BucketAggregationModel instance) =>
     <String, dynamic>{
       'name': instance.name,
       'field': instance.field,

@@ -1,7 +1,7 @@
 import 'package:json_annotation/json_annotation.dart';
 
 import '../domain/bucket.dart';
-import 'facet_request.dart';
+import 'bucket_aggregation_model.dart';
 
 part 'facet.g.dart';
 

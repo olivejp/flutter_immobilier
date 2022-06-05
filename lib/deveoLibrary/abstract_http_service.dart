@@ -90,7 +90,7 @@ abstract class AbstractHttpService<T extends AbstractDomain<U>, U>
         : Uri.http(EnvironmentConfig.serverUrl, path, queryParams);
   }
 
-  decodeResponseBodyWithJsonPath(http.Response response,
+  dynamic decodeResponseBodyWithJsonPath(http.Response response,
       {List<String>? jsonRoot}) {
     dynamic body = jsonDecode(utf8.decode(response.bodyBytes));
     if (jsonRoot != null && jsonRoot.isNotEmpty) {
