@@ -12,12 +12,14 @@ class Annonce extends AbstractDomain<String> {
 
   String? description;
   String? quartier;
-  String? nomAgence;
-  String? categorie;
-  String? type;
-  double? prix;
   double? latitude;
   double? longitude;
+  String? nomAgence;
+  double? prix;
+  String? categorie;
+  String? type;
+  String? transaction;
+  double? superficie;
 
   @override
   Map<String, dynamic> toJson() => _$AnnonceToJson(this);

@@ -68,7 +68,7 @@ abstract class AbstractHttpService<T extends AbstractDomain<U>, U>
   /// 1 - the headers passed to the method level
   /// 2 - the headers passed to the service
   /// 3 - the default headers
-  Map<String, String>? mergeHeaders(Map<String, String>? headers) {
+  Map<String, String>? mergeHeaders({Map<String, String>? headers}) {
     Map<String, String>? authorizationHeaders;
     if (getHeaders != null) {
       authorizationHeaders = getHeaders!();
@@ -111,7 +111,7 @@ abstract class AbstractHttpService<T extends AbstractDomain<U>, U>
     final Uri uri = buildUri(path, queryParams);
     final Map<String, dynamic> bodyJson = body.toJson();
     final String json = jsonEncode(bodyJson);
-    final Map<String, String>? headersToSend = mergeHeaders(headers);
+    final Map<String, String>? headersToSend = mergeHeaders(headers: headers);
 
     return callInterceptor(
       http.post(
@@ -142,7 +142,7 @@ abstract class AbstractHttpService<T extends AbstractDomain<U>, U>
     final Uri uri = buildUri('$path/$id', queryParams);
     final Map<String, dynamic> bodyJson = body.toJson();
     final String json = jsonEncode(bodyJson);
-    final Map<String, String>? headersToSend = mergeHeaders(headers);
+    final Map<String, String>? headersToSend = mergeHeaders(headers: headers);
 
     return callInterceptor(
       http.put(
@@ -171,7 +171,7 @@ abstract class AbstractHttpService<T extends AbstractDomain<U>, U>
     Duration? timeout,
   }) {
     final Uri uri = buildUri('$path/$id', queryParams);
-    final Map<String, String>? headersToSend = mergeHeaders(headers);
+    final Map<String, String>? headersToSend = mergeHeaders(headers: headers);
 
     return callInterceptor(
       http.delete(
@@ -192,7 +192,7 @@ abstract class AbstractHttpService<T extends AbstractDomain<U>, U>
     Duration? timeout,
   }) {
     final Uri uri = buildUri('$path/$id', queryParams);
-    final Map<String, String>? headersToSend = mergeHeaders(headers);
+    final Map<String, String>? headersToSend = mergeHeaders(headers: headers);
 
     return callInterceptor(http.get(uri, headers: headersToSend))
         .then((response) {
@@ -214,7 +214,7 @@ abstract class AbstractHttpService<T extends AbstractDomain<U>, U>
     Duration? timeout,
   }) {
     final Uri uri = buildUri(path, queryParams);
-    final Map<String, String>? headersToSend = mergeHeaders(headers);
+    final Map<String, String>? headersToSend = mergeHeaders(headers: headers);
 
     return callInterceptor(http.get(uri, headers: headersToSend),
             timeout: timeout)
@@ -238,7 +238,7 @@ abstract class AbstractHttpService<T extends AbstractDomain<U>, U>
       Duration? timeout}) {
     final Uri uri = buildUri('$path/$id', queryParams);
     final String jsonBody = jsonEncode([body.toJson()]);
-    final Map<String, String>? headersToSend = mergeHeaders(headers);
+    final Map<String, String>? headersToSend = mergeHeaders(headers: headers);
 
     return callInterceptor(
       http.patch(
