@@ -20,6 +20,7 @@ class Annonce extends AbstractDomain<String> {
   String? type;
   String? transaction;
   double? superficie;
+  int? squareMeterPrice;
 
   @override
   Map<String, dynamic> toJson() => _$AnnonceToJson(this);

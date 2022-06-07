@@ -429,10 +429,7 @@ class CardAnnonce extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Flexible(
-                  child: Image.network(
-                      'https://www.bienmeloger.nc/media/043/thumbs/280718b0-884b-4b72-adc9-fcd2af4778db-202204301043.jpeg'),
-                ),
-                Flexible(
+                  flex: 1,
                   child: Padding(
                     padding: const EdgeInsets.symmetric(vertical: 10),
                     child: Text(
@@ -475,6 +472,16 @@ class CardAnnonce extends StatelessWidget {
                         title: 'Prix',
                         detail: (annonce.prix != null && annonce.prix! > 0)
                             ? formatter.format(annonce.prix)
+                            : 'Inconnu',
+                      ),
+                      Divider(
+                        height: 1,
+                        color: Colors.grey.shade100,
+                      ),
+                      CardAnnonceDetailLine(
+                        title: 'Prix du mètre carré',
+                        detail: (annonce.squareMeterPrice != null && annonce.squareMeterPrice! > 0)
+                            ? formatter.format(annonce.squareMeterPrice)
                             : 'Inconnu',
                       ),
                     ],

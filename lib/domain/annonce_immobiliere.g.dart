@@ -18,7 +18,8 @@ Annonce _$AnnonceFromJson(Map<String, dynamic> json) {
     ..categorie = json['categorie'] as String?
     ..type = json['type'] as String?
     ..transaction = json['transaction'] as String?
-    ..superficie = (json['superficie'] as num?)?.toDouble();
+    ..superficie = (json['superficie'] as num?)?.toDouble()
+    ..squareMeterPrice = json['squareMeterPrice'] as int?;
 }
 
 Map<String, dynamic> _$AnnonceToJson(Annonce instance) => <String, dynamic>{
@@ -33,4 +34,5 @@ Map<String, dynamic> _$AnnonceToJson(Annonce instance) => <String, dynamic>{
       'type': instance.type,
       'transaction': instance.transaction,
       'superficie': instance.superficie,
+      'squareMeterPrice': instance.squareMeterPrice,
     };
